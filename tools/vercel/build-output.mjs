@@ -18,6 +18,8 @@ rmSync(output, { recursive: true, force: true });
 mkdirSync(fn, { recursive: true });
 cpSync(join(dist, 'browser'), join(output, 'static'), { recursive: true });
 cpSync(join(dist, 'server'), join(fn, 'server'), { recursive: true });
+// Vercel would serve this file at /, bypassing SSR. The server bundle has its own copy.
+rmSync(join(output, 'static/index.csr.html'), { force: true });
 
 writeFileSync(
   join(fn, 'index.mjs'),
@@ -29,6 +31,11 @@ writeFileSync(
     runtime: 'nodejs22.x',
     handler: 'index.mjs',
     launcherType: 'Nodejs',
+    // Vercel sets these; Angular falls back to client rendering if they are untrusted.
+    environment: {
+      NG_TRUST_PROXY_HEADERS:
+        'x-forwarded-for,x-forwarded-host,x-forwarded-port,x-forwarded-proto',
+    },
   }),
 );
 
@@ -39,7 +46,7 @@ const staticFiles = readdirSync(join(output, 'static'), {
   recursive: true,
 }).map((file) => String(file).replaceAll('\\', '/'));
 for (const file of staticFiles) {
-  if (!file.endsWith('.html') || file === 'index.html' || file === 'index.csr.html') {
+  if (!file.endsWith('.html') || file === 'index.html') {
     continue;
   }
   overrides[file] = { path: file.replace(/(\/index)?\.html$/, '') };

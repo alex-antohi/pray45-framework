@@ -263,3 +263,12 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Decizie:** Tailwind CSS și PrimeNG nu se instalează în primul commit. Rămân alegerile pentru UI (D-012, D-027) și se adaugă atunci când apare o pagină care are nevoie de ele.
 - **Consecințe:** Înlocuiește partea din D-028 potrivit căreia sandbox-ul are Tailwind și PrimeNG.
 - **Implementare:** `package.json`, `apps/sandbox/`.
+
+## D-032 · SSR pe Vercel: antete de proxy și Node.js 22
+- **Status:** Propusă
+- **Data:** 2026-11-08
+- **Context:** La primul deployment, Angular a trimis pagina goală, doar pentru browser, pentru că Vercel adaugă antetele `x-forwarded-for` și `x-forwarded-port`, în care Angular nu are încredere implicit. În plus, Vercel servea `index.csr.html` la adresa `/`, iar `engines` din `package.json` permitea Node.js 24, deși proiectul e setat pe 22.x.
+- **Decizie propusă:** Funcția de pe Vercel primește variabila `NG_TRUST_PROXY_HEADERS`, doar acolo, pentru că documentația Angular recomandă asta numai în spatele unui proxy de încredere. `index.csr.html` nu se mai publică drept fișier static. Node.js se limitează la `^22.12.0`, aceeași versiune local, la build și în funcție.
+- **Consecințe:** Înlocuiește partea din D-027 care permitea și Node.js 24. Lista de domenii permise (D-029) rămâne activă.
+- **Surse:** https://angular.dev/best-practices/security
+- **Implementare:** `tools/vercel/build-output.mjs`, `package.json`. Neverificat încă printr-un deployment real.

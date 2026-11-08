@@ -97,7 +97,7 @@ docs/
 
 ## Rulare locală
 
-Necesită Node.js `^22.12.0` sau `^24.0.0` (D-027).
+Necesită Node.js `^22.12.0` (D-032).
 
 ```bash
 npm ci
