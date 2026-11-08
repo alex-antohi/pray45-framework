@@ -1,0 +1,7 @@
+/dist
+/coverage
+/.nx/cache
+/.nx/workspace-data
+.angular
+.vercel
+apps/pray45/public/prezentare.html

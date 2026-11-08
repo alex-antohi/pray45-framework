@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Site-uri Pray45</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a technical dossier. Index column on the left (desktop), sections as spec sheets on the right. */
+:root {
+  --bg: #f1f3f2;
+  --surface: #ffffff;
+  --fg: #121614;
+  --muted: #55605b;
+  --line: #d6dbd8;
+  --accent: #1f47d6;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3e9fb;
+  --ochre: #b98512;
+  --ok: #1d7a4a;
+  --ok-soft: #dff1e7;
+  --wip: #8a5a00;
+  --wip-soft: #f6ead0;
+  --plan: #55605b;
+  --plan-soft: #e6e9e7;
+  --belt-white: #f7f7f5;
+  --belt-edge: #c9cfcb;
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2.125rem;
+  --step-4: clamp(2.5rem, 6.2vw, 4.75rem);
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1112; --surface: #161a1c; --fg: #e8ecea; --muted: #9aa49f; --line: #2a3033;
+    --accent: #7f9cff; --accent-ink: #0b0f1a; --accent-soft: #1c2440; --ochre: #e0b04a;
+    --ok: #6fd29c; --ok-soft: #15301f; --wip: #f0c15c; --wip-soft: #3a2c0e; --plan: #a3aca8; --plan-soft: #23292b;
+    --belt-white: #eceeed; --belt-edge: #3a4144;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1112; --surface: #161a1c; --fg: #e8ecea; --muted: #9aa49f; --line: #2a3033;
+  --accent: #7f9cff; --accent-ink: #0b0f1a; --accent-soft: #1c2440; --ochre: #e0b04a;
+  --ok: #6fd29c; --ok-soft: #15301f; --wip: #f0c15c; --wip-soft: #3a2c0e; --plan: #a3aca8; --plan-soft: #23292b;
+  --belt-white: #eceeed; --belt-edge: #3a4144;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.1; }
+p { margin: 0; }
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Hero */
+.hero { border-bottom: 1px solid var(--line); }
+.hero .wrap { padding-block: clamp(40px, 8vw, 96px) clamp(32px, 6vw, 64px); display: grid; gap: 28px; }
+.hero h1 {
+  font-size: var(--step-4);
+  font-weight: 760;
+  font-stretch: 118%;
+  letter-spacing: -0.02em;
+  max-width: 16ch;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero .lede { font-size: var(--step-1); color: var(--muted); max-width: 58ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 28px; padding-top: 8px; }
+.facts div { display: flex; align-items: baseline; gap: 10px; }
+.facts strong { font-family: var(--font-display); font-stretch: 112%; font-size: var(--step-2); font-weight: 700; font-variant-numeric: tabular-nums; }
+.facts span { color: var(--muted); }
+
+/* Main layout */
+.layout { display: grid; gap: 48px; padding-block: 48px 72px; }
+.index { display: none; }
+@media (min-width: 960px) {
+  .layout { grid-template-columns: 200px minmax(0, 1fr); gap: 64px; }
+  .index { display: block; }
+  .index nav { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 32px); display: grid; gap: 4px; }
+  .index a { color: var(--muted); text-decoration: none; padding: 6px 0 6px 12px; border-left: 2px solid var(--line); font-size: var(--step--1); }
+  .index a:hover { color: var(--fg); border-left-color: var(--accent); }
+}
+.sections { display: grid; gap: 88px; min-width: 0; }
+section { display: grid; gap: 28px; min-width: 0; scroll-margin-top: 24px; }
+.section-head { display: grid; gap: 10px; max-width: 64ch; }
+.section-head h2 { font-size: var(--step-3); font-weight: 700; font-stretch: 108%; letter-spacing: -0.01em; }
+.section-head p { color: var(--muted); }
+
+/* Status chips */
+.status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.04em;
+  padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+}
+.status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+[data-status="disponibil"] .status { color: var(--ok); background: var(--ok-soft); }
+[data-status="in-dezvoltare"] .status { color: var(--wip); background: var(--wip-soft); }
+[data-status="planificat"] .status { color: var(--plan); background: var(--plan-soft); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; color: var(--muted); font-size: var(--step--1); }
+
+/* Modules */
+.modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.module { background: var(--surface); padding: 22px 20px 24px; display: grid; grid-template-rows: auto auto 1fr; gap: 10px; align-content: start; min-width: 0; }
+.module .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.module svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.module h3 { font-size: var(--step-1); font-weight: 650; font-stretch: 104%; }
+.module p { color: var(--muted); font-size: 0.9375rem; }
+
+/* Role matrix */
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+thead th { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; background: var(--bg); }
+thead th:not(:first-child), td { text-align: center; width: 13%; }
+tbody th { font-weight: 450; }
+.dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: middle; }
+.dot.full { background: var(--accent); }
+.dot.part { background: linear-gradient(90deg, var(--accent) 50%, transparent 50%); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.dot.none { width: 10px; height: 2px; border-radius: 1px; background: var(--line); }
+.matrix-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: var(--step--1); color: var(--muted); }
+.matrix-legend span { display: inline-flex; align-items: center; gap: 8px; }
+
+/* Case study */
+.case { display: grid; gap: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(20px, 4vw, 36px); }
+.belts { display: grid; gap: 10px; }
+.belt-row { display: flex; height: 18px; border-radius: 3px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--belt-edge); }
+.belt-row span { flex: 1; }
+.belt-names { display: flex; font-family: var(--font-mono); font-size: 0.6875rem; color: var(--muted); letter-spacing: 0.03em; }
+.belt-names span { flex: 1; text-align: center; min-width: 0; overflow-wrap: anywhere; }
+.case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 24px 32px; }
+.case-item { display: grid; gap: 6px; align-content: start; padding-top: 14px; border-top: 2px solid var(--fg); min-width: 0; }
+.case-item h3 { font-size: var(--step-0); font-weight: 650; }
+.case-item p { color: var(--muted); font-size: 0.9375rem; }
+.note { font-size: var(--step--1); color: var(--muted); }
+
+/* Design */
+.principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px 32px; }
+.principle { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.principle h3 { font-size: var(--step-0); font-weight: 650; }
+.principle p { color: var(--muted); font-size: 0.9375rem; }
+.mockups { border: 1.5px dashed var(--line); border-radius: var(--radius); padding: clamp(20px, 4vw, 32px); display: grid; gap: 20px; }
+.devices { display: grid; grid-template-columns: 5fr 3fr 1.6fr; gap: 16px; align-items: end; }
+.device { display: grid; gap: 8px; min-width: 0; }
+.screen { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 7px; align-content: start; }
+.screen i { display: block; height: 8px; border-radius: 3px; background: var(--plan-soft); }
+.screen i.hl { background: var(--accent-soft); height: 30px; }
+.screen i.s { width: 60%; }
+.screen.desk { aspect-ratio: 16 / 10; max-width: 100%; }
+.screen.tab { aspect-ratio: 3 / 4; max-width: 100%; }
+.screen.phone { aspect-ratio: 9 / 18; max-width: 100%; border-radius: 12px; }
+.device .label { font-size: 0.6875rem; }
+
+/* Tech */
+.tech { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.tech-item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.tech-item h3 { font-size: var(--step-0); font-weight: 650; }
+.tech-item p { color: var(--muted); font-size: 0.9375rem; }
+.tech-item .label { color: var(--accent); }
+
+/* Process */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: step; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; padding: 18px 0; border-top: 1px solid var(--line); }
+.steps li:last-child { border-bottom: 1px solid var(--line); }
+.steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--font-mono); color: var(--accent); font-size: var(--step-0); padding-top: 2px; }
+.steps h3 { font-size: var(--step-1); font-weight: 650; }
+.steps p { color: var(--muted); }
+.steps div { display: grid; gap: 4px; }
+
+/* Contact */
+.contact { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(20px, 4vw, 32px); }
+.contact-mail { display: grid; gap: 6px; min-width: 0; }
+.contact-mail a { font-family: var(--font-display); font-stretch: 112%; font-weight: 700; font-size: var(--step-2); text-decoration: none; color: var(--fg); overflow-wrap: anywhere; user-select: all; }
+.contact-mail a:hover { color: var(--accent); }
+.copy { font: inherit; font-weight: 600; cursor: pointer; border: 0; border-radius: var(--radius); padding: 12px 20px; background: var(--accent); color: var(--accent-ink); }
+.copy:hover { filter: brightness(1.08); }
+.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { padding-block: 24px 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; color: var(--muted); font-size: var(--step--1); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="label">Pray45 · site-uri și magazine online</p>
+    <h1>Site-uri care <em>vând</em>, programează și raportează.</h1>
+    <p class="lede">La Pray45 construim site-uri de prezentare și magazine online pe o platformă proprie. Fiecare client primește un design doar al lui, plăți online, conturi pentru clienți și echipă și rapoarte despre afacere.</p>
+    <div class="facts">
+      <div><strong>3</strong><span>tipuri de cont: client, angajat, admin</span></div>
+      <div><strong>8</strong><span>module combinabile</span></div>
+      <div><strong>1</strong><span>platformă, actualizată pentru toți clienții</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <aside class="index" aria-label="Cuprins">
+    <nav>
+      <a href="#module">Ce include</a>
+      <a href="#roluri">Cine ce poate face</a>
+      <a href="#arte-martiale">Exemplu: arte marțiale</a>
+      <a href="#design">Design</a>
+      <a href="#tehnologie">Tehnologie</a>
+      <a href="#proces">Cum lucrăm</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </aside>
+
+  <main class="sections">
+
+    <section id="module" aria-labelledby="module-h">
+      <div class="section-head">
+        <p class="label">Ce include</p>
+        <h2 id="module-h">Module pe care le alegi după nevoie</h2>
+        <p>Un site de prezentare folosește doar primul modul. Un magazin sau o școală le combină pe toate. Pornim de la ce ai nevoie acum și adăugăm restul când crește afacerea.</p>
+      </div>
+      <div class="legend" aria-label="Legendă statusuri">
+        <span data-status="disponibil"><span class="status">Disponibil</span></span>
+        <span data-status="in-dezvoltare"><span class="status">În dezvoltare</span></span>
+        <span data-status="planificat"><span class="status">Planificat</span></span>
+      </div>
+      <div class="modules">
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg><span class="status">Planificat</span></div>
+          <h3>Site de prezentare</h3>
+          <p>Pagini rapide, adaptate pentru telefon și optimizate pentru Google. Conținutul îl modifici singur din panoul de administrare.</p>
+        </article>
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14l-1.5 9h-11z"/><circle cx="9" cy="20" r="1"/><circle cx="16" cy="20" r="1"/><path d="M8 7l1-3h6l1 3"/></svg><span class="status">Planificat</span></div>
+          <h3>Magazin online</h3>
+          <p>Catalog de produse cu poze, variante (mărime, culoare), stoc, coș de cumpărături și comenzi.</p>
+        </article>
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h4"/></svg><span class="status">Planificat</span></div>
+          <h3>Plăți online cu Stripe</h3>
+          <p>Card, Apple Pay și Google Pay, plăți unice sau abonamente lunare. Datele cardului nu trec prin site.</p>
+        </article>
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span class="status">Planificat</span></div>
+          <h3>Autentificare prin email</h3>
+          <p>Fără parole: clientul își scrie adresa de email și primește un link cu care intră în cont. Contul se creează din mers, chiar în timpul cumpărăturii.</p>
+        </article>
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span class="status">Planificat</span></div>
+          <h3>Cont de client</h3>
+          <p>Istoricul comenzilor, abonamentele active, datele personale și programările, într-un singur loc.</p>
+        </article>
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20c1-3.5 3.5-5 6.5-5s5.5 1.5 6.5 5M15.5 15c2.5 0 4.5 1.2 5.5 4"/></svg><span class="status">Planificat</span></div>
+          <h3>Conturi pentru angajați</h3>
+          <p>Fiecare angajat vede doar ce îi trebuie în ziua de lucru: comenzi de pregătit, orarul, prezența.</p>
+        </article>
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v5c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg><span class="status">Planificat</span></div>
+          <h3>Panou de administrare</h3>
+          <p>Produse, prețuri, conținut, comenzi, clienți și conturile echipei. Tu decizi cine are acces la ce.</p>
+        </article>
+        <article class="module" data-status="planificat">
+          <div class="top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="status">Planificat</span></div>
+          <h3>Rapoarte</h3>
+          <p>Încasări pe lună, produse vândute, clienți activi, abonamente care expiră. Grafice și export în Excel (CSV).</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="roluri" aria-labelledby="roluri-h">
+      <div class="section-head">
+        <p class="label">Conturi și acces</p>
+        <h2 id="roluri-h">Cine ce poate face</h2>
+        <p>Accesul e verificat direct în baza de date, nu doar ascuns din meniu. Un client nu poate vedea comenzile altui client, iar un angajat nu vede rapoartele financiare decât dacă îi dai acces.</p>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th scope="col">Acțiune</th><th scope="col">Vizitator</th><th scope="col">Client</th><th scope="col">Angajat</th><th scope="col">Admin</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">Vede site-ul, produsele și prețurile</th><td><span class="dot full" aria-label="da"></span></td><td><span class="dot full" aria-label="da"></span></td><td><span class="dot full" aria-label="da"></span></td><td><span class="dot full" aria-label="da"></span></td></tr>
+            <tr><th scope="row">Își face cont cu adresa de email, fără parolă</th><td><span class="dot full" aria-label="da"></span></td><td><span class="dot none" aria-label="nu se aplică"></span></td><td><span class="dot none" aria-label="nu se aplică"></span></td><td><span class="dot none" aria-label="nu se aplică"></span></td></tr>
+            <tr><th scope="row">Cumpără și plătește online</th><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot full" aria-label="da"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td></tr>
+            <tr><th scope="row">Vede propriile comenzi și abonamente</th><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot full" aria-label="da"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td></tr>
+            <tr><th scope="row">Gestionează comenzile tuturor clienților</th><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot full" aria-label="da"></span></td><td><span class="dot full" aria-label="da"></span></td></tr>
+            <tr><th scope="row">Modifică produse, prețuri și conținut</th><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot part" aria-label="parțial, dacă primește acces"></span></td><td><span class="dot full" aria-label="da"></span></td></tr>
+            <tr><th scope="row">Rapoarte operaționale (comenzi, stoc, prezență)</th><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot full" aria-label="da"></span></td><td><span class="dot full" aria-label="da"></span></td></tr>
+            <tr><th scope="row">Rapoarte financiare (încasări, abonamente)</th><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot part" aria-label="parțial, dacă primește acces"></span></td><td><span class="dot full" aria-label="da"></span></td></tr>
+            <tr><th scope="row">Adaugă și dezactivează conturi de angajați</th><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot none" aria-label="nu"></span></td><td><span class="dot full" aria-label="da"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="matrix-legend">
+        <span><i class="dot full"></i>Are acces</span>
+        <span><i class="dot part"></i>Doar dacă adminul îi dă acces</span>
+        <span><i class="dot none"></i>Nu are acces</span>
+      </div>
+    </section>
+
+    <section id="arte-martiale" aria-labelledby="am-h">
+      <div class="section-head">
+        <p class="label">Primul proiect</p>
+        <h2 id="am-h">Exemplu: o școală de arte marțiale</h2>
+        <p>Același set de module, așezat pe felul în care funcționează un dojo: abonamente lunare, grupe pe vârste, prezență la antrenament și grade.</p>
+      </div>
+      <div class="case">
+        <div class="belts" aria-label="Exemplu de sistem de grade">
+          <div class="belt-row" aria-hidden="true">
+            <span style="background:var(--belt-white)"></span>
+            <span style="background:#e9c21f"></span>
+            <span style="background:#e47b1c"></span>
+            <span style="background:#2f8f3a"></span>
+            <span style="background:#2557b8"></span>
+            <span style="background:#6b4423"></span>
+            <span style="background:#111111"></span>
+          </div>
+          <div class="belt-names">
+            <span>albă</span><span>galbenă</span><span>portocalie</span><span>verde</span><span>albastră</span><span>maro</span><span>neagră</span>
+          </div>
+        </div>
+        <div class="case-grid">
+          <div class="case-item">
+            <h3>Abonamente lunare</h3>
+            <p>Părintele sau sportivul plătește online, iar abonamentul se reînnoiește automat. Școala vede imediat cine are plata la zi.</p>
+          </div>
+          <div class="case-item">
+            <h3>Orar pe grupe</h3>
+            <p>Copii, juniori, adulți, competiție. Fiecare membru își vede orarul în cont.</p>
+          </div>
+          <div class="case-item">
+            <h3>Prezență din telefon</h3>
+            <p>Instructorul bifează prezența la începutul antrenamentului, direct din contul de angajat.</p>
+          </div>
+          <div class="case-item">
+            <h3>Evidența gradelor</h3>
+            <p>Istoricul examenelor și centura actuală pentru fiecare sportiv. Sistemul de grade se configurează pentru fiecare disciplină.</p>
+          </div>
+          <div class="case-item">
+            <h3>Magazin de echipament</h3>
+            <p>Kimono, centuri, protecții, cu mărimi și stoc. Comenzile apar la angajați pentru pregătire.</p>
+          </div>
+          <div class="case-item">
+            <h3>Rapoarte pentru club</h3>
+            <p>Membri activi, prezența pe grupă, încasări pe lună și abonamente care expiră în săptămâna următoare.</p>
+          </div>
+        </div>
+        <p class="note">Culorile centurilor de mai sus sunt un exemplu. Ordinea și numărul gradelor diferă între discipline și se stabilesc împreună cu școala.</p>
+      </div>
+    </section>
+
+    <section id="design" aria-labelledby="design-h">
+      <div class="section-head">
+        <p class="label">Design</p>
+        <h2 id="design-h">Un aspect propriu pentru fiecare client</h2>
+        <p>Platforma e comună, dar designul nu. Fiecare site pornește de la identitatea ta: logo, culori, fotografii, tonul în care vorbești cu clienții.</p>
+      </div>
+      <div class="principles">
+        <div class="principle">
+          <h3>Gândit întâi pentru telefon</h3>
+          <p>Majoritatea vizitatorilor vin de pe mobil. Fiecare pagină se proiectează întâi pentru ecranul mic.</p>
+        </div>
+        <div class="principle">
+          <h3>Rapid</h3>
+          <p>Paginile se încarcă repede, ceea ce contează și pentru vizitatori, și pentru poziția în Google.</p>
+        </div>
+        <div class="principle">
+          <h3>Ușor de folosit</h3>
+          <p>Contrast bun, texte lizibile, butoane mari. Site-ul merge și cu tastatura, și cu cititoare de ecran.</p>
+        </div>
+        <div class="principle">
+          <h3>Mod luminos și întunecat</h3>
+          <p>Site-ul urmează automat setarea telefonului sau a calculatorului vizitatorului.</p>
+        </div>
+      </div>
+      <!-- Când există machete reale, înlocuiește blocul .mockups cu imagini (vezi AGENTS.md). -->
+      <div class="mockups">
+        <div class="devices" aria-hidden="true">
+          <div class="device"><div class="screen desk"><i class="hl"></i><i></i><i class="s"></i><i></i><i class="s"></i></div><span class="label">Desktop</span></div>
+          <div class="device"><div class="screen tab"><i class="hl"></i><i></i><i class="s"></i><i></i></div><span class="label">Tabletă</span></div>
+          <div class="device"><div class="screen phone"><i class="hl"></i><i></i><i class="s"></i></div><span class="label">Telefon</span></div>
+        </div>
+        <p class="note">Machetele vizuale apar aici după etapa de design.</p>
+      </div>
+    </section>
+
+    <section id="tehnologie" aria-labelledby="tech-h">
+      <div class="section-head">
+        <p class="label">Tehnologie</p>
+        <h2 id="tech-h">Ce stă în spatele site-ului</h2>
+        <p>Folosim servicii consacrate, cu care lucrează și companii mari. Pe scurt, ce înseamnă pentru tine:</p>
+      </div>
+      <div class="tech">
+        <div class="tech-item">
+          <p class="label">Angular</p>
+          <h3>Vizibil în Google</h3>
+          <p>Paginile sunt generate pe server, așa că motoarele de căutare le citesc complet, iar vizitatorii le văd imediat.</p>
+        </div>
+        <div class="tech-item">
+          <p class="label">Stripe</p>
+          <h3>Plăți sigure</h3>
+          <p>Plata se face pe pagina securizată Stripe, folosită de milioane de magazine. Noi nu vedem și nu stocăm datele cardului.</p>
+        </div>
+        <div class="tech-item">
+          <p class="label">Supabase · Postgres</p>
+          <h3>Datele tale, separate</h3>
+          <p>Fiecare client are propria bază de date, care nu se amestecă cu a altor clienți. Accesul pe roluri e verificat chiar în baza de date.</p>
+        </div>
+        <div class="tech-item">
+          <p class="label">Vercel</p>
+          <h3>Găzduire rapidă</h3>
+          <p>Site-ul e servit din centre de date din toată lumea, cu HTTPS inclus. Modificările ajung online în câteva minute.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="proces" aria-labelledby="proces-h">
+      <div class="section-head">
+        <p class="label">Cum lucrăm</p>
+        <h2 id="proces-h">De la prima discuție la lansare</h2>
+      </div>
+      <ol class="steps">
+        <li><div><h3>Discuție</h3><p>Aflăm cum funcționează afacerea ta și alegem modulele de care ai nevoie.</p></div></li>
+        <li><div><h3>Design</h3><p>Îți arătăm machete pentru telefon și calculator și le ajustăm până îți plac.</p></div></li>
+        <li><div><h3>Dezvoltare</h3><p>Construim site-ul. Pe parcurs primești un link de previzualizare, ca să vezi progresul.</p></div></li>
+        <li><div><h3>Lansare</h3><p>Conectăm domeniul tău și plățile reale, apoi îți arătăm ție și echipei cum se folosește panoul.</p></div></li>
+        <li><div><h3>Întreținere</h3><p>Site-ul primește actualizările platformei. Adăugăm module noi când ai nevoie de ele.</p></div></li>
+      </ol>
+    </section>
+
+
+    <section id="contact" aria-labelledby="contact-h">
+      <div class="section-head">
+        <p class="label">Contact</p>
+        <h2 id="contact-h">Hai să vorbim despre site-ul tău</h2>
+        <p>Scrie-ne în câteva rânduri ce face afacerea ta și ce ai vrea să poată face site-ul. Îți răspundem cu o propunere de module și pașii următori.</p>
+      </div>
+      <div class="contact">
+        <div class="contact-mail">
+          <span class="label">Email</span>
+          <a id="contact-email" href="mailto:contact@pray45.io">contact@pray45.io</a>
+        </div>
+        <button type="button" id="copy-email" class="copy">Copiază adresa</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Pray45 · contact@pray45.io</span>
+    <span>Actualizat: 8 noiembrie 2026</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy-email');
+  var link = document.getElementById('contact-email');
+  if (!btn || !link) return;
+  btn.addEventListener('click', function () {
+    var text = link.textContent.trim();
+    function done() { btn.textContent = 'Adresă copiată'; setTimeout(function () { btn.textContent = 'Copiază adresa'; }, 2000); }
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents(link);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      btn.textContent = 'Selectată, apasă Ctrl+C';
+    }
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+  });
+})();
+</script>
+
+</body>
+</html>
