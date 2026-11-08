@@ -12,20 +12,22 @@ O bază de cod comună din care construim site-uri pentru clienți: site-uri de 
 |---|---|
 | Repository | https://github.com/alex-antohi/pray45-framework |
 | Vercel | https://vercel.com/pray-45/pray45-framework |
+| Supabase | https://supabase.com/dashboard/project/fcdizyuyogaqwkbfrust |
 | Sandbox (producție) | https://pray45-framework.vercel.app |
+| Task-uri (Trello) | https://trello.com/b/IlBnNpRk/pray45-framework (D-041) |
 
 ## Stadiu
 
-**Faza 1: configurarea de bază.** Există workspace-ul Nx și un site gol pentru teste, `apps/sandbox` (D-028). Următorii pași:
+**Faza 1: configurarea de bază.** Există workspace-ul Nx și un site gol pentru teste, `apps/sandbox` (D-028), și cadrul pentru roluri și permisiuni, `libs/auth` (D-038). Următorii pași:
 
-1. Răspunsuri la întrebările deschise despre facturare (`docs/decizii.md`, Î-5 … Î-9).
-2. Proiectul Supabase în Frankfurt (D-020): schema de bază (`profiles` cu roluri, RLS) și autentificarea prin link magic.
+1. Autentificarea prin link magic (D-018) și rolurile aplicației, pe proiectul Supabase refolosit (D-039).
 
 ## Documente
 
 | Fișier | Ce conține |
 |---|---|
 | `AGENTS.md` | Reguli pentru agenți (încărcat automat prin `CLAUDE.md`) |
+| `libs/auth/README.md` | Cum folosește o aplicație rolurile și permisiunile |
 | `docs/decizii.md` | Jurnalul deciziilor și întrebările deschise. **Sursa de adevăr** pentru stack și arhitectură. |
 | `docs/prezentare/index.html` | Prezentarea pentru clienți (capabilități, roluri, design, proces, contact). Nepublicată online deocamdată (D-030). |
 
@@ -38,13 +40,13 @@ Rezumat. Detaliile și motivele sunt în `docs/decizii.md`.
 | Frontend | Angular 21, cu SSR (`@angular/ssr`) | Implementată (D-010, D-027) |
 | UI | Tailwind CSS v4 + PrimeNG 21 (MIT) | Acceptată, neinstalate încă (D-012, D-027, D-031) |
 | Bază de date, autentificare, fișiere | Supabase (Postgres, Auth, Storage), un proiect per client | Acceptată (D-004, D-013) |
-| Regiunea datelor | Frankfurt, `eu-central-1` | Propusă (D-020) |
+| Regiunea datelor | Irlanda, `eu-west-1` | Implementată (D-040) |
 | Autentificare | Doar link magic pe email, fără parole | Acceptată (D-018) |
 | Logică pe server | Supabase Edge Functions (TypeScript), fără backend dedicat | Acceptată (D-003) |
 | Plăți | Stripe Checkout (plăți unice și abonamente), doar cu cont | Acceptată (D-005, D-019) |
-| Facturare | Interfață comună cu adaptoare injectate (SmartBill, Oblio, mai târziu modulul nostru); facturile stau mereu în baza noastră | Acceptată (D-024, D-025) · detaliile fiscale: Propusă (D-021) |
+| Facturare | Program extern, încă nestabilit | Acceptată (D-045) |
 | Emailuri | Resend (SMTP pentru Supabase Auth și emailuri tranzacționale) | Acceptată (D-014) |
-| Găzduire | Vercel, un proiect per client, funcții SSR în Frankfurt | Implementată (D-006, D-029, D-032, D-033) |
+| Găzduire | Vercel, un proiect per client, funcții SSR în Irlanda | Implementată (D-006, D-029, D-032, D-040) |
 | Organizare cod | Monorepo Nx | Implementată (workspace-ul) · Acceptată (`libs/`) (D-011) |
 
 ## Arhitectură
@@ -52,23 +54,24 @@ Rezumat. Detaliile și motivele sunt în `docs/decizii.md`.
 ```
 Browser ──► Angular (SSR pe Vercel)
                │
-               ├──► Supabase (Frankfurt): Postgres + Auth + Storage
+               ├──► Supabase (Irlanda): Postgres + Auth + Storage
                │      (accesul e controlat de RLS, pe roluri)
                │
                └──► Supabase Edge Functions ──► Stripe (Checkout)
                          ▲                 ├──► Resend (emailuri)
-                         │                 └──► InvoiceProvider ──► SmartBill / Oblio / pray45 ──► RO e-Factura
+                         │                 └──► program de facturare extern
                          │
-              Stripe webhooks (confirmă plățile, declanșează facturile)
+              Stripe webhooks (confirmă plățile)
 ```
 
 ## Roluri
 
 | Rol | Pe scurt |
 |---|---|
-| `client` | Cumpără, plătește, își vede comenzile, facturile, abonamentele și programările. |
+| `client` | Cumpără, plătește, își vede comenzile, abonamentele și programările. |
 | `angajat` | Operațiuni zilnice: comenzi, prezență, rapoarte operaționale. |
 | `admin` | Tot, inclusiv produse, prețuri, conturile angajaților și rapoartele financiare. |
+| `super_admin` | Proprietarul clientului: tot ce poate un admin, plus crearea și dezactivarea conturilor de admin (D-035). |
 
 ## Structura planificată (D-011)
 
@@ -78,15 +81,13 @@ apps/
   arte-martiale/      primul client: branding, pagini, module active (mai târziu)
 libs/
   ui/                 componente și teme comune
-  auth/               autentificare cu link magic, roluri, guards
+  auth/               roluri, permisiuni, guards (există, D-038); autentificare cu link magic (mai târziu)
   shop/               catalog, coș, checkout
-  invoicing/
-    core/             interfața InvoiceProvider, registrul, serviciul de facturare
-    adapters/         smartbill, oblio, fake, export, mai târziu pray45
   admin/              panou de administrare
   reports/            rapoarte, grafice, export CSV
 supabase/
-  migrations/         schema, singura cale de a modifica baza de date
+  migrations/         schema, singura cale de a modifica baza de date (există, D-038)
+  tests/              testele migrărilor, rulate pe Postgres în memorie (există, D-038)
   functions/          Edge Functions (Stripe, emailuri, facturare, acțiuni de admin)
 tools/
   vercel/             împachetează build-ul pentru Vercel (există, D-029)
@@ -114,6 +115,9 @@ Site-ul pornește la http://localhost:4200.
 | Build de producție | `npx nx build sandbox` |
 | Rulează build-ul de producție (http://localhost:4000) | `node dist/apps/sandbox/server/server.mjs` |
 | Teste | `npx nx test sandbox` |
+| Teste pentru `libs/auth` | `npx nx test auth` |
+| Teste pentru baza de date | `npx nx test supabase` |
+| Link de autentificare pentru teste (cere `SUPABASE_SECRET_KEY` în terminal, D-046) | `node tools/dev-login.mjs <email>` |
 | Lint | `npx nx lint sandbox` |
 
 ## Publicare pe Vercel

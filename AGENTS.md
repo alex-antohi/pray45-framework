@@ -50,7 +50,6 @@ Actualizarea documentației face parte din task și intră în **același commit
 - **Schema bazei de date se schimbă doar prin migrări**, în `supabase/migrations/`. Niciodată manual din dashboard.
 - **Sumele de plată se calculează pe server**, în funcții serverless, niciodată din prețuri trimise de browser.
 - **Starea unei comenzi sau a unui abonament se schimbă doar din webhook-ul Stripe**, cu semnătura verificată. Nu pe baza redirecționării după plată.
-- **Integrarea cu programele de facturare trece doar prin interfața `InvoiceProvider` (D-025).** Nu apela API-ul SmartBill, Oblio sau ANAF din afara adaptorului lui. Un adaptor nou trebuie să treacă testele de contract.
 - **Codul refolosibil merge în `libs/`, codul specific unui client în `apps/<client>/`.** Când același lucru apare la al doilea client, mută-l în `libs/`.
 
 ## Prezentarea pentru clienți

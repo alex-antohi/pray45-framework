@@ -14,13 +14,9 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 
 | # | Întrebare | Note |
 |---|---|---|
-| Î-5 | Facturare: confirmarea punctelor 1–6 din D-021 (cine emite, când, rambursări, date de facturare) | Strategia (D-024) și arhitectura (D-025) sunt stabilite. Rămân Î-7, Î-8 și Î-9. |
-| Î-7 | Școala de arte marțiale este firmă înregistrată în România? Este plătitoare de TVA? | Stabilește regulile de facturare și TVA. |
-| Î-8 | Ce program de facturare folosește deja școala sau contabilul ei (SmartBill, Oblio, altul)? | Integrăm programul pe care îl folosesc deja, ca să nu-și schimbe contabilitatea. |
-| Î-9 | Confirmarea contabilului școlii pentru fluxul de facturare din D-021 | În special: factură pentru fiecare plată online, în locul bonului fiscal. |
-| Î-10 | Adresa de contact reală a studioului | `contact@pray45.io` e provizorie (D-022). |
+| Q-10 | Adresa de contact reală a studioului | `contact@pray45.io` e provizorie (D-022). |
 
-Întrebări închise: Î-1 → D-017 · Î-2 → D-018 · Î-3 → D-022 · Î-4 → D-020 · Î-6 → D-019.
+Întrebări închise: Q-1 → D-017 · Q-2 → D-018 · Q-3 → D-022 · Q-4 → D-020 · Q-6 → D-019 · Q-5, Q-7, Q-8, Q-9 → D-045.
 
 ---
 
@@ -73,7 +69,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** —
 
 ## D-008 · Roluri: client, angajat, admin
-- **Status:** Acceptată (cerința) · Propusă (mecanismul)
+- **Status:** Acceptată (cerința) · Înlocuită de D-034 (mecanismul)
 - **Data:** 2026-11-08
 - **Decizie:** Există trei tipuri de cont: **client** (cumpără, își vede comenzile și abonamentele), **angajat** (operațiuni zilnice, de ex. comenzi și prezență) și **admin** (tot, inclusiv conturile angajaților și rapoartele financiare).
 - **Mecanism propus:** tabelul `profiles` (legat de `auth.users`) cu coloana `role`. Politicile RLS din Postgres decid ce vede și ce modifică fiecare rol. Rolurile se schimbă doar de un admin, printr-o funcție pe server.
@@ -98,7 +94,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Data:** 2026-11-08
 - **Decizie:** Un singur repository Nx. Fiecare client are o aplicație subțire în `apps/<client>/` (branding, pagini, ce module sunt active). Funcționalitatea comună stă în `libs/`: `ui`, `auth`, `shop`, `admin`, `reports`, `invoicing`.
 - **Consecințe:** O corectură într-un modul comun ajunge la toți clienții. Fiecare aplicație din `apps/` e un proiect Vercel separat (D-006).
-- **Implementare:** `nx.json`, `package.json`, `apps/sandbox/` (D-028). `libs/` nu există încă.
+- **Implementare:** `nx.json`, `package.json`, `apps/sandbox/` (D-028), `libs/auth/` (D-038). Celelalte biblioteci nu există încă.
 
 ## D-012 · UI: Tailwind CSS v4 + PrimeNG
 - **Status:** Acceptată · amânată de D-031
@@ -155,7 +151,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** —
 
 ## D-020 · Regiunea datelor: Frankfurt (eu-central-1)
-- **Status:** Propusă
+- **Status:** Înlocuită de D-040
 - **Data:** 2026-11-08
 - **Context:** Supabase permite alegerea regiunii pentru fiecare proiect, la creare. Regiunea nu se poate schimba ulterior fără migrarea într-un proiect nou. Regiunile din UE sunt Frankfurt (`eu-central-1`), Irlanda (`eu-west-1`), Paris (`eu-west-3`) și Stockholm (`eu-north-1`). Londra și Zürich sunt în Europa, dar nu în UE. Regiunea generală „Europe” poate ajunge în afara UE, deci se alege o regiune anume.
 - **Decizie:** Toate proiectele Supabase ale clienților (D-013) se creează în **Frankfurt (`eu-central-1`)**: este în UE (pentru GDPR) și e cea mai apropiată regiune de România.
@@ -163,13 +159,13 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** —
 
 ## D-021 · Facturare: emitentul este clientul, factura se generează automat după plată
-- **Status:** Propusă
+- **Status:** Înlocuită de D-045
 - **Data:** 2026-11-08
 - **Context:** Stripe încasează banii, dar chitanțele Stripe nu sunt facturi fiscale. Din 2025, în România, facturile către persoane fizice (B2C) se transmit și prin RO e-Factura (SPV). Pentru plățile online, regula „bon fiscal sau factură” e neclară, după sursele consultate.
 - **Decizie propusă:**
   1. **Cine emite.** Factura către cumpărător o emite **firma clientului** (de ex. școala), pe CUI-ul ei, din contul ei în programul de facturare. Pray45 nu emite facturi în numele clienților. Pray45 își facturează doar propriile servicii către clienți, separat de platformă.
-  2. **Când.** Automat, pentru **fiecare plată reușită**, inclusiv fiecare reînnoire de abonament. Declanșatorul e webhook-ul Stripe verificat: `checkout.session.completed` pentru plățile unice și `invoice.paid` pentru abonamente. O factură pentru fiecare plată online evită zona neclară a bonului fiscal (de confirmat cu contabilul, Î-9).
-  3. **Cum.** O Edge Function apelează API-ul programului de facturare al clientului (SmartBill sau Oblio, după Î-8). Programul generează factura și o transmite în e-Factura. Cumpărătorul primește PDF-ul pe email (Resend) și îl găsește și în contul lui.
+  2. **Când.** Automat, pentru **fiecare plată reușită**, inclusiv fiecare reînnoire de abonament. Declanșatorul e webhook-ul Stripe verificat: `checkout.session.completed` pentru plățile unice și `invoice.paid` pentru abonamente. O factură pentru fiecare plată online evită zona neclară a bonului fiscal (de confirmat cu contabilul, Q-9).
+  3. **Cum.** O Edge Function apelează API-ul programului de facturare al clientului (SmartBill sau Oblio, după Q-8). Programul generează factura și o transmite în e-Factura. Cumpărătorul primește PDF-ul pe email (Resend) și îl găsește și în contul lui.
   4. **Fără dubluri.** Fiecare plată Stripe se leagă de cel mult o factură (cheie unică pe ID-ul plății), ca să nu se emită două facturi când Stripe retrimite un webhook.
   5. **Rambursări.** O rambursare din Stripe (`charge.refunded`) generează automat factura de stornare.
   6. **Date de facturare.** Se cer o singură dată și se salvează în cont: nume și adresă, opțional firmă și CUI pentru persoane juridice. CNP-ul nu se cere; pentru persoane fizice fără CNP se folosește codul generic din 13 zerouri.
@@ -181,7 +177,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 ## D-022 · Contactul din prezentare
 - **Status:** Acceptată
 - **Data:** 2026-11-08
-- **Decizie:** Prezentarea pentru clienți e semnată **Pray45**, cu adresa de contact `contact@pray45.io`. Adresa e **provizorie** și se înlocuiește când există una reală (Î-10).
+- **Decizie:** Prezentarea pentru clienți e semnată **Pray45**, cu adresa de contact `contact@pray45.io`. Adresa e **provizorie** și se înlocuiește când există una reală (Q-10).
 - **Implementare:** `docs/prezentare/index.html` (secțiunea Contact și subsolul).
 
 ## D-023 · Lucrul cu Git: branch-uri și review înainte de commit
@@ -191,7 +187,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** `AGENTS.md`, secțiunea „Lucrul cu Git”.
 
 ## D-024 · Facturare în etape: întâi programul clientului, apoi modulul nostru
-- **Status:** Acceptată
+- **Status:** Înlocuită de D-045
 - **Data:** 2026-11-08
 - **Context:** Am discutat varianta unui program de facturare propriu. E posibil, dar presupune trimiterea directă în RO e-Factura (XML UBL 2.1 / CIUS-RO, API-ul ANAF, autorizarea fiecărei firme cu certificat digital), arhivarea și exportul pentru contabil. Toate acestea înseamnă săptămâni de lucru și responsabilitate legală pentru corectitudinea facturilor.
 - **Decizie:**
@@ -201,7 +197,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** —
 
 ## D-025 · Facturare pluginabilă: interfață comună și adaptoare injectate
-- **Status:** Acceptată
+- **Status:** Înlocuită de D-045
 - **Data:** 2026-11-08
 - **Context:** Datele noastre trebuie să se poată conecta ușor la orice program de facturare, inclusiv la modulul nostru viitor (D-024). Detaliază punctul 7 din D-021.
 - **Decizie:**
@@ -274,8 +270,143 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** `tools/vercel/build-output.mjs`, `package.json`. Verificat în producție pe https://pray45-framework.vercel.app.
 
 ## D-033 · Funcția SSR rulează în Frankfurt
-- **Status:** Implementată
+- **Status:** Înlocuită de D-040
 - **Data:** 2026-11-08
 - **Context:** Implicit, Vercel rulează funcțiile în Washington (`iad1`), iar datele din Supabase vor fi în Frankfurt (D-020). Fiecare interogare făcută la randarea pe server ar traversa Atlanticul.
 - **Decizie:** Funcția SSR rulează în Frankfurt (`fra1`).
+- **Implementare:** `tools/vercel/build-output.mjs`. Verificat în producție: antetul `x-vercel-id` arată `fra1::fra1`.
+
+## D-034 · Permisiuni per utilizator, cu valori implicite pe rol
+- **Status:** Implementată · înlocuiește mecanismul din D-008 · punctul 2 și consecințele sunt înlocuite de D-036
+- **Data:** 2026-11-08
+- **Context:** Cele trei roluri fixe din D-008 nu acoperă ce promite prezentarea: un angajat poate primi acces la rapoartele financiare sau la modificarea produselor „doar dacă adminul îi dă acces”.
+- **Decizie:**
+  1. Fiecare cont are un rol (`client`, `angajat`, `admin`) în `profiles.role` și o listă proprie de permisiuni în `user_permissions`.
+  2. Fiecare rol are un set implicit de permisiuni (`role_permissions`). Când se creează un cont, setul implicit se copiază la acel utilizator. După aceea, permisiunile lui se pot modifica individual.
+  3. Toate rolurile folosesc aceeași interfață. Codul verifică permisiuni (`can('reports.financial')`), nu roluri. Meniul, rutele (`canMatch`) și paginile folosesc aceeași verificare.
+  4. Accesul real e impus în baza de date: politicile RLS folosesc funcția SQL `has_permission()`, care citește aceleași date.
+  5. Rolurile și permisiunile se schimbă doar printr-o funcție pe server. Un utilizator nu își poate modifica propriul rol sau propriile permisiuni și nu poate acorda permisiuni pe care nu le are.
+  6. Conturile de client se creează singure la prima autentificare (D-019), deci rolul `client` și permisiunile implicite se setează în baza de date, la crearea contului, niciodată din date trimise de browser.
+- **Consecințe:** Schimbarea valorilor implicite afectează doar conturile noi. Când un modul nou adaugă o permisiune, migrarea lui trebuie să o acorde și utilizatorilor existenți, după rol.
+- **Implementare:** `supabase/migrations/20261108120000_access_control.sql`, `libs/auth/` (D-038).
+
+## D-035 · Super-admin: singurul care creează admini
+- **Status:** Acceptată
+- **Data:** 2026-11-08
+- **Context:** D-008 nu spune cine creează adminii. Un admin care poate numi alți admini sau își poate acorda orice drept anulează separarea din D-034.
+- **Decizie:**
+  1. Rol nou, `super_admin`: aceeași interfață ca a unui admin, plus crearea și dezactivarea conturilor de admin. Adminii gestionează în continuare conturile de angajați.
+  2. E un rol, nu o permisiune, și nu se poate acorda din aplicație. Se setează doar cu un script care folosește cheia `service_role`, la configurarea clientului, în proiectul Supabase al acestuia (D-013).
+- **Deținător:** proprietarul clientului (de ex. proprietarul școlii). Pray45 nu are nevoie de cont în aplicație: repară accesul cu scriptul.
+- **Implementare:** Regula e în `supabase/migrations/20261108120000_access_control.sql` (D-038): rangul cel mai mare nu se poate atribui din aplicație. Rolul în sine îl adaugă fiecare aplicație.
+
+## D-036 · Valorile implicite ale unui rol se aplică și conturilor existente
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** D-034 copiază valorile implicite la crearea contului, deci o schimbare ulterioară ar ajunge doar la conturile noi. În plus, o copie nu poate deosebi o permisiune refuzată intenționat de una pe care utilizatorul nu a avut-o niciodată.
+- **Decizie:** Când o permisiune se adaugă la valorile implicite ale unui rol, fie că e una existentă, fie una nouă (de exemplu o pagină nouă), o primesc toți utilizatorii existenți cu acel rol.
+- **Mecanism:**
+  1. Valorile implicite nu se mai copiază. `role_permissions` rămâne singura sursă pentru un rol, iar `user_permission_overrides` păstrează doar excepțiile unui utilizator (acordat sau refuzat).
+  2. `has_permission()` citește întâi excepția utilizatorului, apoi valoarea implicită a rolului.
+  3. O excepție rămâne valabilă când se schimbă valorile implicite. „Revino la implicit” o șterge. La schimbarea rolului, excepțiile se șterg.
+  4. Rolul limitează ce permisiuni pot fi acordate: un cont de client nu poate primi permisiuni rezervate echipei.
+- **Consecințe:** Înlocuiește punctul 2 și consecințele din D-034. Un cont nou pornește de la valorile implicite ale rolului, iar migrările nu mai trebuie să actualizeze conturile existente. Rolul rămâne necesar: definește valorile implicite, cine gestionează pe cine și ce permisiuni sunt posibile.
+- **Implementare:** `supabase/migrations/20261108120000_access_control.sql` (D-038).
+
+## D-037 · Ierarhia rolurilor și gestionarea conturilor
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** D-035 stabilește doar cine creează adminii. Trebuie stabilit cine gestionează fiecare tip de cont.
+- **Decizie:** Rangurile sunt, de sus în jos: `super_admin`, `admin`, `angajat`, `client`. Fiecare rang gestionează toate rangurile de sub el. Nimeni nu gestionează conturi de același rang sau de rang mai mare.
+- **Mecanism:**
+  1. Câte o permisiune pentru fiecare tip de cont gestionat: `clients.manage`, `employees.manage`, `admins.manage`.
+  2. O acțiune asupra unui cont e permisă doar dacă sunt adevărate ambele condiții: cel care acționează are rang mai mare decât contul vizat și are permisiunea pentru acel tip de cont. Verificarea se face în funcția de pe server (D-034).
+  3. Permisiunea poate fi retrasă individual, ca oricare alta (D-036), dar nu poate depăși rangul: `admins.manage` rămâne doar la `super_admin` (D-035).
+  4. Un utilizator poate atribui doar roluri de sub rangul lui.
+- **Implementare:** `supabase/migrations/20261108120000_access_control.sql`, `libs/auth/` (D-038).
+
+## D-038 · Cadru generic pentru roluri și permisiuni
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** Rolurile diferă de la o aplicație la alta, deci framework-ul nu trebuie să le cunoască.
+- **Decizie:**
+  1. Rolurile, rangurile și permisiunile sunt date pe care le adaugă fiecare aplicație. Framework-ul nu definește niciun rol.
+  2. Singura regulă despre roluri din cod este cine gestionează pe cine: rang mai mare și permisiunea `<rol>.manage`. Aceste nume înlocuiesc exemplele din D-037, punctul 1.
+  3. Un rând în `role_permissions` înseamnă că rolul poate avea permisiunea. Lipsa rândului înseamnă că nu o poate avea niciodată (D-036).
+  4. Contul nou primește rolul cu rangul cel mai mic. Rangul cel mai mare nu se poate atribui din aplicație (D-035).
+  5. Rolurile și permisiunile se schimbă prin funcții Postgres, ca verificările să stea lângă date (D-034, punctul 5).
+- **Consecințe:** Angular primește datele printr-un `AccessLoader`, pentru că nu există încă un client Supabase. Crearea și dezactivarea conturilor nu sunt incluse. Înregistrarea eșuează până când aplicația își definește rolurile.
+- **Implementare:** `supabase/migrations/20261108120000_access_control.sql`, `libs/auth/`. Testele migrării sunt în `supabase/tests/` și rulează pe Postgres (PGlite), cu autentificarea Supabase simulată. Migrarea e aplicată pe proiectul Supabase din D-039.
+
+## D-039 · Proiectul Supabase al aplicației draftless se refolosește pentru framework
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** Framework-ul are nevoie de o bază de date pentru teste, iar proiectul Supabase al aplicației draftless, care găzduiește și ear fish, poate fi refolosit.
+- **Decizie:** Proiectul se golește complet și rămâne doar pentru framework și `apps/sandbox`. Clienții reali au în continuare proiecte separate (D-013).
+- **Consecințe:** draftless și ear fish nu mai funcționează pe acest proiect, iar datele lor se pierd definitiv. Migrarea din `supabase/migrations/` nu trebuie adaptată la schema draftless. Proiectul e în Irlanda (D-040).
+- **Implementare:** `supabase/config.toml`. Proiectul `fcdizyuyogaqwkbfrust` a fost golit, iar migrările sunt aplicate. Autentificarea eșuează până când se adaugă roluri (D-038).
+
+## D-040 · Regiunea: Irlanda (eu-west-1), pentru date și funcții
+- **Status:** Implementată · înlocuiește D-020 și D-033
+- **Data:** 2026-11-08
+- **Context:** Proiectul Supabase refolosit (D-039) e în Irlanda, iar regiunea unui proiect nu se poate schimba ulterior. Funcția SSR trebuie să stea lângă date.
+- **Decizie:** Proiectele Supabase se creează în Irlanda (`eu-west-1`), iar funcția SSR rulează tot în Irlanda (`dub1`).
+- **Consecințe:** Datele rămân în UE, deci motivul GDPR din D-020 rămâne valabil.
 - **Implementare:** `tools/vercel/build-output.mjs`. De verificat la următorul deployment, în antetul `x-vercel-id`.
+
+## D-041 · Task-urile se urmăresc în Trello
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** Proiectul nu avea un loc pentru urmărirea task-urilor. Pentru dimensiunea lui, Trello acoperă ce am fi folosit din Jira. Legarea branch-urilor de carduri nu e automată, ca în Jira.
+- **Decizie:**
+  1. Task-urile stau pe board-ul Trello `pray45-framework`, cu listele Backlog, To Do, Doing, Verificare și Done.
+  2. Fiecare card are un singur branch. Numele branch-ului se notează într-un comentariu pe card când începe lucrul, pentru că un branch ajunge pe GitHub abia după acordul utilizatorului (D-023).
+  3. Agenții mută cardurile pe măsură ce lucrează: Doing la început, Verificare când modificările așteaptă verificarea utilizatorului, Done după commit și push.
+  4. După push, branch-ul se atașează cardului prin GitHub Power-Up, din interfața Trello.
+- **Consecințe:** `docs/decizii.md` rămâne sursa de adevăr pentru decizii; board-ul urmărește doar munca. O întrebare deschisă sau o decizie Propusă poate avea un card, dar răspunsul se notează tot în jurnal.
+- **Implementare:** https://trello.com/b/IlBnNpRk/pray45-framework. GitHub Power-Up este activat pe board.
+
+## D-042 · Întrebările deschise au prefixul Q
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Decizie:** Întrebările deschise se numerotează Q-N în loc de Î-N. Numerele rămân aceleași (de ex. Î-7 devine Q-7).
+- **Consecințe:** Excepție, la cererea utilizatorului, de la regula că intrările vechi nu se rescriu: referințele la întrebări au fost actualizate și în intrările vechi.
+- **Implementare:** `docs/decizii.md`, `README.md` și cardurile de pe board-ul Trello (D-041).
+
+## D-043 · Rangul contează doar la schimbarea accesului
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** Verificările obișnuite trebuie să depindă doar de permisiuni. Rangul stabilește doar ordinea dintre roluri, iar rolul are lista permisiunilor pe care le poate primi.
+- **Decizie:**
+  1. Toate verificările, inclusiv citirea conturilor, depind doar de permisiuni. Pentru a citi conturile unui rol e nevoie de `<rol>.manage`.
+  2. Activarea, dezactivarea și resetarea unei permisiuni trec prin aceleași patru verificări: cel care acționează are `<rol>.manage` pentru rolul contului vizat, are rang mai mare decât acel cont, rolul contului vizat poate primi permisiunea, iar cel care acționează are el însuși permisiunea.
+- **Consecințe:** Înlocuiește D-037, punctul 2, pentru citirea conturilor și extinde D-034, punctul 5: nimeni nu poate dezactiva o permisiune pe care nu o are. Schimbarea rolului păstrează verificările din D-037.
+- **Implementare:** `supabase/migrations/20261108120000_access_control.sql`, `supabase/tests/`. Aplicată pe proiectul Supabase din D-039.
+
+## D-044 · Rolul super_admin și crearea rolurilor din aplicație
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** Fiecare proiect are nevoie de rolul `super_admin` (D-035), iar rangurile mai mari trebuie să poată crea ranguri mai mici și să le stabilească permisiunile implicite.
+- **Decizie:**
+  1. Migrarea adaugă rolul `super_admin`, cu rangul 1000. E singurul rol definit de framework.
+  2. Cine are permisiunea `roles.manage` poate crea roluri cu rang mai mic decât al lui și poate schimba permisiunile implicite ale rolurilor de sub el. Pentru o schimbare a valorilor implicite trebuie să dețină el însuși permisiunea, indiferent dacă o activează sau o dezactivează.
+  3. Rolul nou primește automat `<rol>.manage` pentru toate rolurile de sub el, iar rolurile de deasupra primesc `<rol_nou>.manage`. Niciun rol nu poate primi `.manage` pentru rangul lui sau pentru unul mai mare.
+  4. Rangul cel mai mare deține orice permisiune pe care o introduce.
+  5. Sign-up-ul nu atribuie niciodată rangul cel mai mare. Cât timp nu există un rol mai mic, contul nou nu are profil, deci nu are acces.
+- **Consecințe:** Înlocuiește D-038, punctul 1, pentru `super_admin`, și regula din D-038 că înregistrarea eșuează când nu există roluri. Crearea unui rol nou de rang minim schimbă rolul primit la înregistrare.
+- **Implementare:** `supabase/migrations/20261108120000_access_control.sql`, `supabase/tests/`, `libs/auth/src/lib/supabase/`, `apps/sandbox/src/app/app.config.ts`, `apps/sandbox/src/app/supabase.config.ts`.
+
+## D-045 · Facturare printr-un program extern, plăți prin Stripe
+- **Status:** Acceptată · înlocuiește D-021, D-024 și D-025
+- **Data:** 2026-11-08
+- **Decizie:** Facturile se emit printr-un program de facturare extern. Plățile rămân prin Stripe (D-005). Programul, integrarea și regulile fiscale nu sunt stabilite.
+- **Consecințe:** Întrebările Q-5, Q-7, Q-8 și Q-9 se închid. Mențiunile despre facturare din D-003, D-005, D-011, D-014 și D-019 nu mai stabilesc nimic despre facturare.
+- **Implementare:** —
+
+## D-046 · Autentificare pentru teste cu un link generat local
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** Conturile de test nu au neapărat o căsuță de email reală, iar autentificarea se face doar prin link magic (D-018).
+- **Decizie:** Pentru teste, un script local generează linkul de autentificare și îl afișează în terminal, fără să trimită email. Scriptul folosește cheia secretă Supabase, citită din mediu. Nu face parte din aplicație.
+- **Consecințe:** Autentificarea rămâne fără parole (D-018).
+- **Implementare:** `tools/dev-login.mjs`. Neverificat încă cu cheia reală.

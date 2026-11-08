@@ -3,7 +3,9 @@ import {
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideSupabase } from '@pray45/auth';
 import { appRoutes } from './app.routes';
+import { supabaseConfig } from './supabase.config';
 import {
   provideClientHydration,
   withEventReplay,
@@ -14,5 +16,6 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(withEventReplay()),
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes),
+    provideSupabase(supabaseConfig),
   ],
 };
