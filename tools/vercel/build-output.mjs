@@ -31,6 +31,8 @@ writeFileSync(
     runtime: 'nodejs22.x',
     handler: 'index.mjs',
     launcherType: 'Nodejs',
+    // Same region as Supabase (D-020, D-033).
+    regions: ['fra1'],
     // Vercel sets these; Angular falls back to client rendering if they are untrusted.
     environment: {
       NG_TRUST_PROXY_HEADERS:

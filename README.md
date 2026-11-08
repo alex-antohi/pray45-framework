@@ -12,14 +12,14 @@ O bază de cod comună din care construim site-uri pentru clienți: site-uri de 
 |---|---|
 | Repository | https://github.com/alex-antohi/pray45-framework |
 | Vercel | https://vercel.com/pray-45/pray45-framework |
+| Sandbox (producție) | https://pray45-framework.vercel.app |
 
 ## Stadiu
 
 **Faza 1: configurarea de bază.** Există workspace-ul Nx și un site gol pentru teste, `apps/sandbox` (D-028). Următorii pași:
 
 1. Răspunsuri la întrebările deschise despre facturare (`docs/decizii.md`, Î-5 … Î-9).
-2. Setarea proiectului Vercel pentru `apps/sandbox` și primul deployment (vezi „Publicare pe Vercel”).
-3. Proiectul Supabase în Frankfurt (D-020): schema de bază (`profiles` cu roluri, RLS) și autentificarea prin link magic.
+2. Proiectul Supabase în Frankfurt (D-020): schema de bază (`profiles` cu roluri, RLS) și autentificarea prin link magic.
 
 ## Documente
 
@@ -44,7 +44,7 @@ Rezumat. Detaliile și motivele sunt în `docs/decizii.md`.
 | Plăți | Stripe Checkout (plăți unice și abonamente), doar cu cont | Acceptată (D-005, D-019) |
 | Facturare | Interfață comună cu adaptoare injectate (SmartBill, Oblio, mai târziu modulul nostru); facturile stau mereu în baza noastră | Acceptată (D-024, D-025) · detaliile fiscale: Propusă (D-021) |
 | Emailuri | Resend (SMTP pentru Supabase Auth și emailuri tranzacționale) | Acceptată (D-014) |
-| Găzduire | Vercel, un proiect per client | Acceptată (D-006) · publicarea: Propusă (D-029) |
+| Găzduire | Vercel, un proiect per client, funcții SSR în Frankfurt | Implementată (D-006, D-029, D-032, D-033) |
 | Organizare cod | Monorepo Nx | Implementată (workspace-ul) · Acceptată (`libs/`) (D-011) |
 
 ## Arhitectură

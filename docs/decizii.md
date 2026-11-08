@@ -61,10 +61,10 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** —
 
 ## D-006 · Găzduire: Vercel
-- **Status:** Acceptată
+- **Status:** Implementată
 - **Data:** 2026-11-08
 - **Decizie:** Fiecare site al unui client este un proiect Vercel separat, legat de repository-ul GitHub. Push pe `main` publică în producție; celelalte branch-uri primesc un URL de previzualizare.
-- **Implementare:** Proiectul Vercel `pray-45/pray45-framework` este creat. Când apar aplicațiile în `apps/`, fiecare are nevoie de propriul „Root Directory” și de propria comandă de build în Vercel. Pentru `apps/sandbox`: `apps/sandbox/vercel.json` și `tools/vercel/build-output.mjs` (D-029). Neverificat încă printr-un deployment real.
+- **Implementare:** Proiectul Vercel `pray-45/pray45-framework` este creat. Când apar aplicațiile în `apps/`, fiecare are nevoie de propriul „Root Directory” și de propria comandă de build în Vercel. Pentru `apps/sandbox`: `apps/sandbox/vercel.json` și `tools/vercel/build-output.mjs` (D-029). Verificat în producție pe https://pray45-framework.vercel.app.
 
 ## D-007 · Autentificare prin email
 - **Status:** Acceptată · metoda e stabilită în D-018
@@ -240,13 +240,13 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** `apps/sandbox/`.
 
 ## D-029 · Publicarea pe Vercel prin Build Output API
-- **Status:** Propusă
+- **Status:** Implementată
 - **Data:** 2026-11-08
 - **Context:** Presetul Vercel pentru Angular nu tratează SSR-ul: trimite toate cererile către `index.html`.
 - **Decizie propusă:** Fiecare aplicație are propriul `vercel.json`, deci în Vercel se setează doar „Root Directory”. După build, `tools/vercel/build-output.mjs` pune fișierele statice în `.vercel/output/static` și serverul Angular într-o funcție Node.js.
 - **Consecințe:** Domeniile pe care rulează SSR-ul trebuie permise în `security.allowedHosts` (`project.json`) sau în variabila de mediu `NG_ALLOWED_HOSTS`. Sunt permise `localhost` și `*.vercel.app`; un domeniu propriu trebuie adăugat.
 - **Surse:** https://vercel.com/docs/build-output-api · https://vercel.com/docs/monorepos/nx
-- **Implementare:** `apps/sandbox/vercel.json`, `tools/vercel/build-output.mjs`. Neverificat încă printr-un deployment real.
+- **Implementare:** `apps/sandbox/vercel.json`, `tools/vercel/build-output.mjs`. Verificat în producție pe https://pray45-framework.vercel.app.
 
 ## D-030 · Prezentarea nu mai e publicată ca Artifact
 - **Status:** Implementată
@@ -265,10 +265,17 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Implementare:** `package.json`, `apps/sandbox/`.
 
 ## D-032 · SSR pe Vercel: antete de proxy și Node.js 22
-- **Status:** Propusă
+- **Status:** Implementată
 - **Data:** 2026-11-08
 - **Context:** La primul deployment, Angular a trimis pagina goală, doar pentru browser, pentru că Vercel adaugă antetele `x-forwarded-for` și `x-forwarded-port`, în care Angular nu are încredere implicit. În plus, Vercel servea `index.csr.html` la adresa `/`, iar `engines` din `package.json` permitea Node.js 24, deși proiectul e setat pe 22.x.
 - **Decizie propusă:** Funcția de pe Vercel primește variabila `NG_TRUST_PROXY_HEADERS`, doar acolo, pentru că documentația Angular recomandă asta numai în spatele unui proxy de încredere. `index.csr.html` nu se mai publică drept fișier static. Node.js se limitează la `^22.12.0`, aceeași versiune local, la build și în funcție.
 - **Consecințe:** Înlocuiește partea din D-027 care permitea și Node.js 24. Lista de domenii permise (D-029) rămâne activă.
 - **Surse:** https://angular.dev/best-practices/security
-- **Implementare:** `tools/vercel/build-output.mjs`, `package.json`. Neverificat încă printr-un deployment real.
+- **Implementare:** `tools/vercel/build-output.mjs`, `package.json`. Verificat în producție pe https://pray45-framework.vercel.app.
+
+## D-033 · Funcția SSR rulează în Frankfurt
+- **Status:** Implementată
+- **Data:** 2026-11-08
+- **Context:** Implicit, Vercel rulează funcțiile în Washington (`iad1`), iar datele din Supabase vor fi în Frankfurt (D-020). Fiecare interogare făcută la randarea pe server ar traversa Atlanticul.
+- **Decizie:** Funcția SSR rulează în Frankfurt (`fra1`).
+- **Implementare:** `tools/vercel/build-output.mjs`. De verificat la următorul deployment, în antetul `x-vercel-id`.
