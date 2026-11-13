@@ -18,7 +18,7 @@ O bază de cod comună din care construim site-uri pentru clienți: site-uri de 
 
 ## Stadiu
 
-**Faza 1: configurarea de bază.** Există workspace-ul Nx și un site gol pentru teste, `apps/sandbox` (D-028), și cadrul pentru roluri și permisiuni, `libs/auth` (D-038). Următorii pași:
+**Faza 1: configurarea de bază.** Există workspace-ul Nx, un site pentru teste, `apps/sandbox` (D-028), cadrul pentru roluri și permisiuni, `libs/auth` (D-038), și stilul aplicației, `libs/ui`: trei fonturi, trei culori, numele, logo-ul și semnătura, plus un picker care le schimbă de pe orice pagină, doar pentru cine are permisiunea `brand.manage` (D-047, D-048, D-050). Stilul unui site stă în codul aplicației și nu are mod întunecat (D-052). Următorii pași:
 
 1. Autentificarea prin link magic (D-018) și rolurile aplicației, pe proiectul Supabase refolosit (D-039).
 
@@ -28,6 +28,7 @@ O bază de cod comună din care construim site-uri pentru clienți: site-uri de 
 |---|---|
 | `AGENTS.md` | Reguli pentru agenți (încărcat automat prin `CLAUDE.md`) |
 | `libs/auth/README.md` | Cum folosește o aplicație rolurile și permisiunile |
+| `libs/ui/README.md` | Cum își declară o aplicație stilul și cum se folosește picker-ul |
 | `docs/decizii.md` | Jurnalul deciziilor și întrebările deschise. **Sursa de adevăr** pentru stack și arhitectură. |
 | `docs/prezentare/index.html` | Prezentarea pentru clienți (capabilități, roluri, design, proces, contact). Nepublicată online deocamdată (D-030). |
 
@@ -39,6 +40,8 @@ Rezumat. Detaliile și motivele sunt în `docs/decizii.md`.
 |---|---|---|
 | Frontend | Angular 21, cu SSR (`@angular/ssr`) | Implementată (D-010, D-027) |
 | UI | Tailwind CSS v4 + PrimeNG 21 (MIT) | Acceptată, neinstalate încă (D-012, D-027, D-031) |
+| Stil | `libs/ui`: variabile CSS pentru trei fonturi și trei culori, numele, logo-ul și semnătura, picker | Implementată (D-047, D-048, D-050, D-052, D-053) |
+| Fonturi | Google Fonts, dintr-o listă de 15 fonturi | Implementată (D-051) |
 | Bază de date, autentificare, fișiere | Supabase (Postgres, Auth, Storage), un proiect per client | Acceptată (D-004, D-013) |
 | Regiunea datelor | Irlanda, `eu-west-1` | Implementată (D-040) |
 | Autentificare | Doar link magic pe email, fără parole | Acceptată (D-018) |
@@ -77,10 +80,10 @@ Browser ──► Angular (SSR pe Vercel)
 
 ```
 apps/
-  sandbox/            site gol pentru testarea framework-ului (există, D-028)
+  sandbox/            site pentru testarea framework-ului (există, D-028)
   arte-martiale/      primul client: branding, pagini, module active (mai târziu)
 libs/
-  ui/                 componente și teme comune
+  ui/                 componente și teme comune; stilul și picker-ul există (D-047, D-048)
   auth/               roluri, permisiuni, guards (există, D-038); autentificare cu link magic (mai târziu)
   shop/               catalog, coș, checkout
   admin/              panou de administrare
@@ -116,6 +119,7 @@ Site-ul pornește la http://localhost:4200.
 | Rulează build-ul de producție (http://localhost:4000) | `node dist/apps/sandbox/server/server.mjs` |
 | Teste | `npx nx test sandbox` |
 | Teste pentru `libs/auth` | `npx nx test auth` |
+| Teste pentru `libs/ui` | `npx nx test ui` |
 | Teste pentru baza de date | `npx nx test supabase` |
 | Link de autentificare pentru teste (cere `SUPABASE_SECRET_KEY` în terminal, D-046) | `node tools/dev-login.mjs <email>` |
 | Lint | `npx nx lint sandbox` |

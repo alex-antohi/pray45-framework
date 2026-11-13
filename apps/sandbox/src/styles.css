@@ -1,1 +1,37 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+ * The brand tokens (--font-*, --color-*, --color-on-*) come from provideBrand.
+ * The page background is the secondary color (D-053), so text and surfaces are
+ * derived from --color-on-secondary and stay readable whatever color is
+ * chosen. There is no dark mode (D-052).
+ */
+:root {
+  color-scheme: light;
+  --surface: var(--color-secondary);
+  --ink: var(--color-on-secondary);
+  --muted: color-mix(in srgb, var(--color-on-secondary) 72%, transparent);
+  --line: color-mix(in srgb, var(--color-on-secondary) 22%, transparent);
+  --card: color-mix(in srgb, var(--color-on-secondary) 7%, transparent);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-secondary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-primary);
+  line-height: 1.15;
+  text-wrap: balance;
+}

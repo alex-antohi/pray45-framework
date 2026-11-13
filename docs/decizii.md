@@ -16,7 +16,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 |---|---|---|
 | Q-10 | Adresa de contact reală a studioului | `contact@pray45.io` e provizorie (D-022). |
 
-Întrebări închise: Q-1 → D-017 · Q-2 → D-018 · Q-3 → D-022 · Q-4 → D-020 · Q-6 → D-019 · Q-5, Q-7, Q-8, Q-9 → D-045.
+Întrebări închise: Q-1 → D-017 · Q-2 → D-018 · Q-3 → D-022 · Q-4 → D-020 · Q-6 → D-019 · Q-5, Q-7, Q-8, Q-9 → D-045 · Q-11 → D-050 · Q-12 → D-052.
 
 ---
 
@@ -94,7 +94,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Data:** 2026-11-08
 - **Decizie:** Un singur repository Nx. Fiecare client are o aplicație subțire în `apps/<client>/` (branding, pagini, ce module sunt active). Funcționalitatea comună stă în `libs/`: `ui`, `auth`, `shop`, `admin`, `reports`, `invoicing`.
 - **Consecințe:** O corectură într-un modul comun ajunge la toți clienții. Fiecare aplicație din `apps/` e un proiect Vercel separat (D-006).
-- **Implementare:** `nx.json`, `package.json`, `apps/sandbox/` (D-028), `libs/auth/` (D-038). Celelalte biblioteci nu există încă.
+- **Implementare:** `nx.json`, `package.json`, `apps/sandbox/` (D-028), `libs/auth/` (D-038), `libs/ui/` (D-047). Celelalte biblioteci nu există încă.
 
 ## D-012 · UI: Tailwind CSS v4 + PrimeNG
 - **Status:** Acceptată · amânată de D-031
@@ -352,7 +352,7 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Context:** Proiectul Supabase refolosit (D-039) e în Irlanda, iar regiunea unui proiect nu se poate schimba ulterior. Funcția SSR trebuie să stea lângă date.
 - **Decizie:** Proiectele Supabase se creează în Irlanda (`eu-west-1`), iar funcția SSR rulează tot în Irlanda (`dub1`).
 - **Consecințe:** Datele rămân în UE, deci motivul GDPR din D-020 rămâne valabil.
-- **Implementare:** `tools/vercel/build-output.mjs`. De verificat la următorul deployment, în antetul `x-vercel-id`.
+- **Implementare:** `tools/vercel/build-output.mjs`. Verificat în producție: antetul `x-vercel-id` arată `fra1::dub1`.
 
 ## D-041 · Task-urile se urmăresc în Trello
 - **Status:** Implementată
@@ -410,3 +410,82 @@ Intrările noi se adaugă la final, cu următorul număr liber. Intrările vechi
 - **Decizie:** Pentru teste, un script local generează linkul de autentificare și îl afișează în terminal, fără să trimită email. Scriptul folosește cheia secretă Supabase, citită din mediu. Nu face parte din aplicație.
 - **Consecințe:** Autentificarea rămâne fără parole (D-018).
 - **Implementare:** `tools/dev-login.mjs`. Neverificat încă cu cheia reală.
+
+## D-047 · Stilul aplicației: trei fonturi, trei culori, numele, logo-ul și semnătura
+- **Status:** Implementată · detaliile au fost confirmate de utilizator pe 2026-11-13 · detaliul 4 e înlocuit de D-052 (modul luminos sau întunecat) și de D-053 (fundalul)
+- **Data:** 2026-11-11
+- **Context:** Cerința utilizatorului: designul unei aplicații are doar câteva elemente, ca aspectul să se poată schimba ușor de la un client la altul.
+- **Decizie:**
+  1. Stilul are doar: font principal, font secundar, font de accent; culoare principală, culoare secundară, culoare de accent; numele brandului, logo-ul și semnătura (numele, mai pe scurt).
+  2. Numele, logo-ul și semnătura există fiecare în format dreptunghiular și în format pătrat.
+  3. Codul stă în `libs/ui`. Aplicațiile folosesc stilul prin variabile CSS (`--font-primary`, `--color-primary` etc.) și prin componenta `<lib-brand-mark>`. Valorile implicite le dă fiecare aplicație, cu `provideBrand()`.
+- **Detalii (confirmate):**
+  1. Rolul fonturilor: principalul pentru titluri și brand, secundarul pentru textul paginilor, cel de accent pentru etichete, cifre și evidențieri.
+  2. Pentru fiecare culoare se calculează automat culoarea textului pus peste ea (`--color-on-primary` etc.): alb sau aproape negru, cea cu contrast mai mare.
+  3. Un format fără imagine se afișează ca text cu fontul principal. Numele dreptunghiular stă pe un rând, iar cel pătrat are cuvintele unul sub altul. Semnătura apare ca text. Logo-ul pătrat devine un pătrat în culoarea principală, cu semnătura, iar logo-ul dreptunghiular devine logo-ul pătrat urmat de nume.
+  4. Fundalul și culoarea textului obișnuit nu fac parte din stil. Le definește fiecare aplicație și urmează setarea de mod luminos sau întunecat a vizitatorului.
+- **Consecințe:** Stilurile sunt CSS simplu, iar Tailwind rămâne neinstalat (D-031). Variabilele au numele din tema Tailwind v4 (`--font-*`, `--color-*`), deci se pot folosi direct când se instalează.
+- **Implementare:** `libs/ui/src/lib/brand/`, `apps/sandbox/src/app/brand.config.ts`, `apps/sandbox/src/app/pages/home.ts` (pagina care arată toate elementele), `apps/sandbox/src/styles.css`, `apps/sandbox/public/brand/` (logo provizoriu).
+
+## D-048 · Picker pentru stil, disponibil pe orice pagină
+- **Status:** Implementată (cerința) · Acceptată (salvarea doar în browser, prin D-050) · punctul 4 înlocuit de D-050
+- **Data:** 2026-11-11
+- **Decizie:** Un buton „Stil”, fixat în colțul paginii, deschide un panou din care se aleg toate elementele din D-047. Schimbările se aplică imediat.
+- **Mecanism propus:**
+  1. Componenta `<lib-brand-picker>` stă în componenta rădăcină a aplicației, deci apare pe orice pagină. E un punct de intrare separat (`@pray45/ui/picker`) și se încarcă după pagină (`@defer`), ca un site care nu îl folosește să nu îl descarce.
+  2. Fonturile se aleg dintr-o listă fixă (D-049), culorile din selectorul de culoare sau prin cod hex, iar imaginile se încarcă din calculator: SVG, PNG, WebP sau JPEG, cel mult 200 KB fiecare.
+  3. Schimbările se păstrează doar în browserul în care s-au făcut (`localStorage`). Ceilalți vizitatori văd valorile implicite ale aplicației.
+  4. În sandbox, picker-ul e vizibil pentru oricine.
+- **Consecințe:** Deocamdată picker-ul e un instrument de lucru, nu o setare a site-ului. Cum se salvează stilul pentru toți vizitatorii și cine îl poate schimba rămâne de stabilit (Q-11).
+- **Implementare:** `libs/ui/picker/`, `apps/sandbox/src/app/app.ts`.
+
+## D-049 · Fonturile se încarcă de la Bunny Fonts, dintr-o listă fixă
+- **Status:** Înlocuită de D-051
+- **Data:** 2026-11-11
+- **Context:** Picker-ul trebuie să poată încerca multe fonturi fără ca toate să fie incluse în aplicație. Google Fonts, încărcat direct din pagină, trimite adresa IP a vizitatorului către Google, iar un tribunal din München a considerat asta o încălcare a GDPR (LG München I, 3 O 17493/20, ianuarie 2022).
+- **Decizie propusă:**
+  1. Fonturile se încarcă de la Bunny Fonts (`fonts.bunny.net`), al unei firme din UE. Serviciul e compatibil cu API-ul Google Fonts și declară că nu păstrează loguri.
+  2. Lista are 15 fonturi, plus fontul sistemului, care nu se descarcă: fonturi fără serife, cu serife, de afiș, monospace și scris de mână. Toate au ș și ț cu virgulă.
+  3. Se descarcă doar cele trei fonturi alese, într-o singură cerere.
+- **De știut:** pentru unele fonturi, CSS-ul de la Bunny trimite browserul să descarce fișierele de pe `cdn.jsdelivr.net` (Fontsource), nu de pe serverele Bunny.
+- **Alternativă:** fonturile alese de un client se găzduiesc pe domeniul site-ului lui (pachetele Fontsource), fără niciun serviciu extern. Picker-ul ar folosi în continuare Bunny Fonts.
+- **Surse:** https://fonts.bunny.net/about
+- **Implementare:** `libs/ui/src/lib/brand/fonts.ts`, `libs/ui/src/lib/brand/brand.service.ts`.
+
+## D-050 · Picker-ul apare doar cu permisiunea brand.manage, iar stilul stă în codul aplicației
+- **Status:** Implementată · migrarea nu e aplicată încă pe proiectul Supabase
+- **Data:** 2026-11-13
+- **Context:** Răspunsul utilizatorului la Q-11.
+- **Decizie:**
+  1. Stilul unui site stă în codul aplicației lui (de ex. `apps/sandbox/src/app/brand.config.ts`), deocamdată. Nu se salvează în baza de date.
+  2. Picker-ul apare doar pentru utilizatorii cu permisiunea `brand.manage`. Rămâne un instrument de lucru: schimbările făcute în el se păstrează doar în browserul acelui utilizator (D-048, punctul 3).
+  3. `super_admin` are permisiunea implicit și o poate acorda altor roluri cu `set_role_permission` (D-044).
+- **Consecințe:** Înlocuiește D-048, punctul 4: picker-ul nu mai e vizibil pentru oricine pe sandbox. Ca un stil ales în picker să ajungă la vizitatori, valorile se copiază în codul aplicației. Verificarea din Angular doar ascunde picker-ul; nu protejează nimic, pentru că picker-ul nu scrie în baza de date.
+- **Implementare:** `supabase/migrations/20261113120000_brand_permission.sql`, `supabase/tests/access_control.test.mjs`, `apps/sandbox/src/app/app.ts`. Până la aplicarea migrării pe proiectul Supabase (D-039), picker-ul nu apare pentru nimeni pe sandbox.
+
+## D-051 · Fonturile se încarcă de la Google Fonts
+- **Status:** Implementată · înlocuiește D-049
+- **Data:** 2026-11-13
+- **Context:** Alegerea utilizatorului: Google Fonts e serviciul cel mai folosit.
+- **Decizie:** Fonturile din listă (aceleași 15 din D-049, plus fontul sistemului) se încarcă de la Google Fonts (`fonts.googleapis.com`, fișierele de pe `fonts.gstatic.com`). Se descarcă doar cele trei fonturi alese, într-o singură cerere.
+- **Consecințe:** Browserul vizitatorului trimite adresa IP către Google la fiecare vizită. Un tribunal din München a considerat asta o încălcare a GDPR fără acordul vizitatorului (LG München I, 3 O 17493/20, ianuarie 2022). Riscul rămâne de tratat la lansare: acordul vizitatorului, mențiunea în politica de confidențialitate sau găzduirea fonturilor pe domeniul site-ului.
+- **Implementare:** `libs/ui/src/lib/brand/fonts.ts`, `libs/ui/src/lib/brand/brand.service.ts`.
+
+## D-052 · Fără mod luminos și mod întunecat
+- **Status:** Implementată
+- **Data:** 2026-11-13
+- **Context:** Răspunsul utilizatorului la Q-12.
+- **Decizie:** Un site arată mereu cum și-a ales clientul stilul, indiferent de setarea de mod luminos sau întunecat a vizitatorului. Nu există variante de logo sau de culori pentru modul întunecat.
+- **Consecințe:** Înlocuiește D-047, detaliul 4, în partea despre modul luminos sau întunecat. Fundalul și textul neutru rămân definite de aplicație, cu valori fixe, iar paginile declară `color-scheme: light`, ca browserul să nu întunece nici câmpurile de formular. Prezentarea pentru clienți nu mai promite modul întunecat.
+- **Implementare:** `apps/sandbox/src/styles.css`, `libs/ui/picker/src/brand-picker.css`, `apps/sandbox/public/brand/logo-rectangle.svg`, `docs/prezentare/index.html`.
+
+## D-053 · Fundalul paginii este culoarea secundară
+- **Status:** Implementată
+- **Data:** 2026-11-13
+- **Context:** Cerința utilizatorului.
+- **Decizie:**
+  1. Fundalul paginilor e culoarea secundară (`--color-secondary`), iar textul obișnuit e culoarea calculată pentru ea (`--color-on-secondary`).
+  2. Nuanțele neutre (text estompat, linii, fundalul cardurilor) se derivă din `--color-on-secondary`, deci se potrivesc cu orice culoare secundară.
+  3. În sandbox, culoarea secundară e o nuanță deschisă a culorii principale: `#e3e9fb`, lângă albastrul `#1f47d6`. Pe acest fundal, culoarea principală are contrast 5,9:1.
+- **Consecințe:** Înlocuiește D-047, detaliul 4, în partea despre fundal. Un element colorat cu culoarea secundară are nevoie de un contur, pentru că altfel se pierde în fundal. Clientul trebuie să aleagă culoarea principală și cea de accent astfel încât să se vadă pe culoarea secundară; picker-ul nu verifică acest contrast. Logo-urile date ca imagini trebuie să se vadă pe fundalul ales.
+- **Implementare:** `apps/sandbox/src/styles.css`, `apps/sandbox/src/app/pages/home.ts`, `apps/sandbox/src/app/brand.config.ts`, `libs/ui/picker/src/brand-picker.ts` (eticheta culorii secundare).

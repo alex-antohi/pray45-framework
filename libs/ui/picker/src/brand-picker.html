@@ -1,0 +1,159 @@
+<button
+  #toggleButton
+  type="button"
+  class="toggle"
+  aria-controls="brand-picker"
+  [attr.aria-expanded]="open()"
+  (click)="toggle()"
+>
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <circle
+      cx="12"
+      cy="12"
+      r="9"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    />
+    <circle cx="8.5" cy="10" r="1.6" fill="currentColor" />
+    <circle cx="12" cy="7.5" r="1.6" fill="currentColor" />
+    <circle cx="15.5" cy="10" r="1.6" fill="currentColor" />
+  </svg>
+  Stil
+</button>
+
+@if (open()) {
+<section
+  #panel
+  id="brand-picker"
+  class="panel"
+  role="dialog"
+  aria-labelledby="brand-picker-title"
+  tabindex="-1"
+  (keydown.escape)="close()"
+>
+  <header>
+    <h2 id="brand-picker-title">Stilul aplicației</h2>
+    <button type="button" class="ghost" aria-label="Închide" (click)="close()">
+      ✕
+    </button>
+  </header>
+
+  <fieldset>
+    <legend>Brand</legend>
+    <label>
+      Nume
+      <input
+        type="text"
+        [maxLength]="maxName"
+        [value]="nameDraft()"
+        (input)="setName($event)"
+      />
+    </label>
+    <label>
+      Semnătură <small>numele, mai pe scurt</small>
+      <input
+        type="text"
+        [maxLength]="maxSignature"
+        [value]="signatureDraft()"
+        (input)="setSignature($event)"
+      />
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Fonturi</legend>
+    @for (role of fontRoles; track role) {
+    <label>
+      {{ fontLabels[role][0] }} <small>{{ fontLabels[role][1] }}</small>
+      <select (change)="setFont(role, $event)">
+        @for (font of fonts; track font.id) {
+        <option [value]="font.id" [selected]="font.id === brand().fonts[role]">
+          {{ font.family }}
+        </option>
+        }
+      </select>
+    </label>
+    <p class="sample" [style.font-family]="fontStack(brand().fonts[role])">
+      Aa Ăă Ââ Îî Șș Țț 0123
+    </p>
+    }
+  </fieldset>
+
+  <fieldset>
+    <legend>Culori</legend>
+    @for (role of colorRoles; track role) {
+    <div class="color">
+      <input
+        type="color"
+        [attr.aria-label]="colorLabels[role]"
+        [value]="brand().colors[role]"
+        (input)="setColor(role, $event)"
+      />
+      <label>
+        {{ colorLabels[role] }}
+        <input
+          type="text"
+          class="hex"
+          spellcheck="false"
+          maxlength="7"
+          [value]="brand().colors[role]"
+          (change)="setColor(role, $event)"
+        />
+      </label>
+    </div>
+    }
+  </fieldset>
+
+  <fieldset>
+    <legend>Nume, logo și semnătură</legend>
+    <p class="hint">Fără imagine, se afișează textul cu fontul principal.</p>
+    <div class="marks">
+      @for (kind of kinds; track kind) { @for (shape of shapes; track shape) {
+      <div class="mark">
+        <span class="caption"
+          >{{ kindLabels[kind] }}, {{ shapeLabels[shape] }}</span
+        >
+        <span class="preview"
+          ><lib-brand-mark [kind]="kind" [shape]="shape"
+        /></span>
+        <span class="actions">
+          <label class="file">
+            Încarcă
+            <input
+              type="file"
+              [accept]="accept"
+              (change)="upload(kind, shape, $event)"
+            />
+          </label>
+          @if (brand().images[kind][shape]) {
+          <button
+            type="button"
+            class="ghost"
+            (click)="removeImage(kind, shape)"
+          >
+            Fără imagine
+          </button>
+          }
+        </span>
+      </div>
+      } }
+    </div>
+  </fieldset>
+
+  @if (error(); as message) {
+  <p class="error" role="alert">{{ message }}</p>
+  } @if (!service.saved()) {
+  <p class="error" role="alert">
+    Browserul nu a putut salva modificările. Încearcă imagini mai mici.
+  </p>
+  }
+
+  <footer>
+    <button type="button" [disabled]="!service.customized()" (click)="reset()">
+      Revino la valorile implicite
+    </button>
+    <small>Modificările se păstrează doar în acest browser.</small>
+  </footer>
+</section>
+}

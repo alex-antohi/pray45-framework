@@ -4,7 +4,9 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideSupabase } from '@pray45/auth';
+import { provideBrand } from '@pray45/ui';
 import { appRoutes } from './app.routes';
+import { sandboxBrand } from './brand.config';
 import { supabaseConfig } from './supabase.config';
 import {
   provideClientHydration,
@@ -17,5 +19,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes),
     provideSupabase(supabaseConfig),
+    provideBrand(sandboxBrand),
   ],
 };

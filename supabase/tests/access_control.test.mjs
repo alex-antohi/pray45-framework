@@ -582,6 +582,13 @@ describe('role management', () => {
     assert.equal(await has(eva, 'roles.manage'), true);
   });
 
+  test('only super_admin holds brand.manage, until it grants it', async () => {
+    assert.equal(await has(eva, 'brand.manage'), true);
+    assert.equal(await has(dan, 'brand.manage'), false);
+    await setDefault(eva, 'manager', 'brand.manage', true);
+    assert.equal(await has(dan, 'brand.manage'), true);
+  });
+
   test('a new role is managed by every higher rank and manages every lower rank', async () => {
     await createRole(eva, 'coach', 25);
     assert.equal(
